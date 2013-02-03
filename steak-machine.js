@@ -7,6 +7,15 @@ var SteakMachine = function(events) {
   this.state = events[0].from;
 }
 
+SteakMachine.prototype.nextRepeat = function(times) {
+  for(var i = 0; i < times; i++) {
+    var res = this.next();
+    if(!res) return false;
+  }
+
+  return true;
+}
+
 SteakMachine.prototype.next = function() {
   for(var i = 0; i < this.events.length; i++) {
     var event = this.events[i];
@@ -14,6 +23,8 @@ SteakMachine.prototype.next = function() {
     if(event.isValid())
       return event.execute();
   }
+
+  throw new Error("No event available; either it is invalid or you are at the end of the chain.");
 }
 
 SteakMachine.Event = function(event, machine) {
@@ -22,6 +33,9 @@ SteakMachine.Event = function(event, machine) {
 }
 
 SteakMachine.Event.prototype.isValid = function() {
+  if(this.properties["condition"] && !this.properties["condition"]()) 
+    return false;
+
   return (this.machine.state == this.properties["from"]);
 }
 
@@ -33,6 +47,8 @@ SteakMachine.Event.prototype.execute = function() {
 
   if(this.properties["after"]) 
     this.properties["after"]();
+
+  return true;
 }
 
 exports.basic = {
@@ -71,6 +87,20 @@ exports.basic = {
 
     this.tester.stateMachine.next();
     test.equal(this.tester.stateMachine.state, "D");
+
+    test.done();
+  },
+
+  testRepetitiveNext: function(test) {
+    this.tester.stateMachine.nextRepeat(3);
+    test.equal(this.tester.stateMachine.state, "D");
+
+    test.done();
+  },
+
+  testNoEvent: function(test) {
+    this.tester.stateMachine.nextRepeat(3);
+    this.tester.stateMachine.next();
 
     test.done();
   }
@@ -123,6 +153,42 @@ exports.callbacks = {
 
     test.equal(this.events[1], "before");
 
+    test.done();
+  }
+}
+
+exports.simpleConditions = {
+  setUp: function(callback) {
+    var self = this;
+    self.events = [];
+    self.i = 0;
+
+    self.tester = {
+      stateMachine: new SteakMachine([
+         {
+          from: "A",
+          to: "B"
+        },
+        {
+          from: "B",
+          to: "C",
+          condition: function() {
+            return self.i == 1;
+          }
+        },
+        {
+          from: "C",
+          to: "D",
+        }
+      ])
+    }
+
+    callback();
+  },
+
+  testReturnFalseWhenNoValidEvent: function(test) {
+    this.tester.stateMachine.next(); // A -> B
+    test.equal(this.tester.stateMachine.next(), false); // B -> C
     test.done();
   }
 }
