@@ -3,4 +3,4 @@ SRC = steak-machine.js
 .PHONY: test
 
 test:
-	nodeunit test/
+	node_modules/.bin/nodeunit test/

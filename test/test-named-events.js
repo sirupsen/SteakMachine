@@ -1,4 +1,4 @@
-var SteakMachine = require("../steak-machine.js");
+var SteakMachine = require("../lib/steak-machine.js");
 
 exports.namedEvents = {
   setUp: function(callback) {

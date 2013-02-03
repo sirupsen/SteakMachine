@@ -1,0 +1,27 @@
+{
+  "name": "steak-machine",
+  "version": "0.0.1",
+  "author": "Simon Hørup Eskildsen <sirup@sirupsen.com>",
+  "description": "Simple state machine for those who like their meat medium rare",
+  "contributors": [{
+    "name": "Simon Hørup Eskildsen",
+    "email": "sirup@sirupsen.com"
+  }],
+  "scripts": {
+    "test": "node_modules/.bin/nodeunit test"
+  },
+  "main": "./lib/steak-machine.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sirupsen/SteakMachine.git"
+  },
+  "keywords": [
+    "state",
+    "machine"
+  ],
+  "devDependencies": {
+    "nodeunit": "0.7.x"
+  },
+  "license": "MIT",
+  "analyze": true
+}
