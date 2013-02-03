@@ -1,70 +1,75 @@
-var SteakMachine = function(events) {
-  this.events = [];
+SteakMachine = function(events) {
+  var self = this;
+
+  self.events = [];
 
   for(var i = 0; i < events.length; i++)
-    this.events.push(new SteakMachine.Event(events[i], this));
+    self.events.push(new SteakMachine.Event(events[i], this));
 
-  this.state = events[0].from;
-}
+  self.state = events[0].from;
 
-SteakMachine.prototype.nextRepeat = function(times) {
-  for(var i = 0; i < times; i++) {
-    var res = this.next();
-    if(!res) return false;
+  self.nextRepeat = function(times) {
+    for(var i = 0; i < times; i++) {
+      var res = self.next();
+      if(!res) return false;
+    }
+
+    return true;
   }
 
-  return true;
-}
+  self.next = function() {
+    for(var i = 0; i < self.events.length; i++) {
+      var event = self.events[i];
 
-SteakMachine.prototype.next = function() {
-  for(var i = 0; i < this.events.length; i++) {
-    var event = this.events[i];
-
-    if(event.isValid())
-      return event.execute();
-  }
-
-  throw new Error("No event available; either it is invalid or you are at the end of the chain.");
-}
-
-SteakMachine.prototype.transition = function(name) {
-  for(var i = 0; i < this.events.length; i++) {
-    var event = this.events[i];
-
-    if(event.properties["name"] == name) {
-      if(event.isValid()) {
+      if(event.isValid())
         return event.execute();
-      } else {
-        throw new Error("Invalid transition");
+    }
+
+    throw new Error("No event available; either it is invalid or you are at the end of the chain.");
+  }
+
+  self.transition = function(name) {
+    for(var i = 0; i < self.events.length; i++) {
+      var event = self.events[i];
+
+      if(event.properties["name"] == name) {
+        if(event.isValid()) {
+          return event.execute();
+        } else {
+          throw new Error("Invalid transition");
+        }
       }
     }
-  }
 
-  throw new Error("Transition does not exist.");
+    throw new Error("Transition does not exist.");
+  }
 }
 
 SteakMachine.Event = function(event, machine) {
-  this.properties = event;
-  this.machine = machine;
+  var self = this;
+
+  self.properties = event;
+  self.machine = machine;
+
+  self.isValid = function() {
+    if(self.properties["condition"] && !self.properties["condition"]()) 
+      return false;
+
+    return (self.machine.state == self.properties["from"]);
+  }
+
+  self.execute = function() {
+    if(self.properties["before"]) 
+      self.properties["before"]();
+
+    self.machine.state = self.properties["to"];
+
+    if(self.properties["after"]) 
+      self.properties["after"]();
+
+    return true;
+  }
 }
 
-SteakMachine.Event.prototype.isValid = function() {
-  if(this.properties["condition"] && !this.properties["condition"]()) 
-    return false;
-
-  return (this.machine.state == this.properties["from"]);
-}
-
-SteakMachine.Event.prototype.execute = function() {
-  if(this.properties["before"]) 
-    this.properties["before"]();
-
-  this.machine.state = this.properties["to"];
-
-  if(this.properties["after"]) 
-    this.properties["after"]();
-
-  return true;
-}
-
-module.exports = SteakMachine;
+if (typeof(module) != "undefined") 
+  module.exports = SteakMachine;
