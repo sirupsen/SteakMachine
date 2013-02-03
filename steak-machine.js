@@ -1,12 +1,29 @@
-SteakMachine = function(events) {
+SteakMachine = function(events, subject) {
   var self = this;
 
+  self.subject = subject;
   self.events = [];
 
   for(var i = 0; i < events.length; i++)
-    self.events.push(new SteakMachine.Event(events[i], this));
+    self.events.push(new SteakMachine.Event(events[i], self));
 
-  self.state = events[0].from;
+  self.state = function() {
+    if(typeof(self.subject.state) == "function") {
+      return self.subject.state();
+    } else {
+      return self.subject.state;
+    }
+  }
+
+  self.setState = function(newState) {
+    if(typeof(self.subject.state) == "function") {
+      self.subject.state(newState);
+    } else {
+      self.subject.state = newState;
+    }
+  }
+
+  self.setState(self.events[0].properties["from"]);
 
   self.nextRepeat = function(times) {
     for(var i = 0; i < times; i++) {
@@ -55,14 +72,14 @@ SteakMachine.Event = function(event, machine) {
     if(self.properties["condition"] && !self.properties["condition"]()) 
       return false;
 
-    return (self.machine.state == self.properties["from"]);
+    return (self.machine.subject.state == self.properties["from"]);
   }
 
   self.execute = function() {
     if(self.properties["before"]) 
       self.properties["before"]();
 
-    self.machine.state = self.properties["to"];
+    self.machine.subject.state = self.properties["to"];
 
     if(self.properties["after"]) 
       self.properties["after"]();
