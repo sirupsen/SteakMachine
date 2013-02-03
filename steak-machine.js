@@ -49,11 +49,11 @@ SteakMachine = function(events, subject) {
     for(var i = 0; i < self.events.length; i++) {
       var event = self.events[i];
 
-      if(event.properties["name"] == name) {
+      if(event.properties.name == name) {
         if(event.isValid()) {
           return event.execute();
         } else {
-          throw new Error("Invalid transition");
+          throw new Error("Invalid transition from " + name + " to " + event.properties.name);
         }
       }
     }
@@ -72,7 +72,10 @@ SteakMachine.Event = function(event, machine) {
     if(self.properties.condition && !self.properties.condition()) 
       return false;
 
-    return (self.machine.state() == self.properties.from);
+    if(self.machine.state() != self.properties.from)
+      return false;
+
+    return true;
   }
 
   self.execute = function() {
