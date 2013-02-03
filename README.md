@@ -1,4 +1,4 @@
-# SteakMachine
+# SteakMachine [![Build Status](https://travis-ci.org/Sirupsen/SteakMachine.png?branch=master)](https://travis-ci.org/Sirupsen/SteakMachine)
 
 Do you like your Javascript states medium rare? Then Steak Machine is the
 simple Javascript state machine with tacky puns you've been longing for.
