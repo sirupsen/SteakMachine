@@ -27,6 +27,22 @@ SteakMachine.prototype.next = function() {
   throw new Error("No event available; either it is invalid or you are at the end of the chain.");
 }
 
+SteakMachine.prototype.transition = function(name) {
+  for(var i = 0; i < this.events.length; i++) {
+    var event = this.events[i];
+
+    if(event.properties["name"] == name) {
+      if(event.isValid()) {
+        return event.execute();
+      } else {
+        throw new Error("Invalid transition");
+      }
+    }
+  }
+
+  throw new Error("Transition does not exist.");
+}
+
 SteakMachine.Event = function(event, machine) {
   this.properties = event;
   this.machine = machine;
@@ -100,7 +116,7 @@ exports.basic = {
 
   testNoEvent: function(test) {
     this.tester.stateMachine.nextRepeat(3);
-    this.tester.stateMachine.next();
+    test.throws(function() { this.tester.stateMachine.next() });
 
     test.done();
   }
@@ -188,7 +204,55 @@ exports.simpleConditions = {
 
   testReturnFalseWhenNoValidEvent: function(test) {
     this.tester.stateMachine.next(); // A -> B
-    test.equal(this.tester.stateMachine.next(), false); // B -> C
+    test.throws(function(){this.tester.stateMachine.next()}); // B -> C
     test.done();
   }
 }
+
+exports.namedEvents = {
+  setUp: function(callback) {
+    var self = this;
+    self.events = [];
+    self.i = 0;
+
+    self.tester = {
+      stateMachine: new SteakMachine([
+         {
+          name: "Pet",
+          from: "A",
+          to: "B"
+        },
+        {
+          name: "Eat",
+          from: "B",
+          to: "C"
+        },
+        {
+          name: "Sleep",
+          from: "C",
+          to: "D"
+        }
+      ])
+    }
+
+    callback();
+  },
+
+  testNamedEvents: function(test) {
+    this.tester.stateMachine.transition("Pet");
+    test.equal(this.tester.stateMachine.state, "B");
+
+    test.throws(function(){this.tester.stateMachine.transition("Sleep")});
+
+    this.tester.stateMachine.transition("Eat");
+    test.equal(this.tester.stateMachine.state, "C");
+
+    test.throws(function(){this.tester.stateMachine.transition("Pet")});
+
+    this.tester.stateMachine.transition("Sleep");
+    test.equal(this.tester.stateMachine.state, "D");
+
+    test.done();
+  }
+
+};
