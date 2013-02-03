@@ -23,7 +23,7 @@ exports.namedEvents = {
           from: "C",
           to: "D"
         }
-      ])
+      ], this)
     }
 
     callback();
@@ -31,17 +31,17 @@ exports.namedEvents = {
 
   testNamedEvents: function(test) {
     this.tester.stateMachine.transition("Pet");
-    test.equal(this.tester.stateMachine.state, "B");
+    test.equal(this.tester.stateMachine.state(), "B");
 
     test.throws(function(){this.tester.stateMachine.transition("Sleep")});
 
     this.tester.stateMachine.transition("Eat");
-    test.equal(this.tester.stateMachine.state, "C");
+    test.equal(this.tester.stateMachine.state(), "C");
 
     test.throws(function(){this.tester.stateMachine.transition("Pet")});
 
     this.tester.stateMachine.transition("Sleep");
-    test.equal(this.tester.stateMachine.state, "D");
+    test.equal(this.tester.stateMachine.state(), "D");
 
     test.done();
   }

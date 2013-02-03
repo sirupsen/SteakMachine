@@ -25,7 +25,7 @@ exports.callbacks = {
             self.events.push("before");
           }
         }
-      ])
+      ], this)
     }
 
     callback();

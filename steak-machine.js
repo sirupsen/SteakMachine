@@ -72,14 +72,14 @@ SteakMachine.Event = function(event, machine) {
     if(self.properties["condition"] && !self.properties["condition"]()) 
       return false;
 
-    return (self.machine.subject.state == self.properties["from"]);
+    return (self.machine.state() == self.properties["from"]);
   }
 
   self.execute = function() {
     if(self.properties["before"]) 
       self.properties["before"]();
 
-    self.machine.subject.state = self.properties["to"];
+    self.machine.setState(self.properties["to"]);
 
     if(self.properties["after"]) 
       self.properties["after"]();
