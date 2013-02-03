@@ -69,20 +69,20 @@ SteakMachine.Event = function(event, machine) {
   self.machine = machine;
 
   self.isValid = function() {
-    if(self.properties["condition"] && !self.properties["condition"]()) 
+    if(self.properties.condition && !self.properties.condition()) 
       return false;
 
-    return (self.machine.state() == self.properties["from"]);
+    return (self.machine.state() == self.properties.from);
   }
 
   self.execute = function() {
-    if(self.properties["before"]) 
-      self.properties["before"]();
+    if(typeof(self.properties.before) == "function") 
+      self.properties.before();
 
-    self.machine.setState(self.properties["to"]);
+    self.machine.setState(self.properties.to);
 
-    if(self.properties["after"]) 
-      self.properties["after"]();
+    if(typeof(self.properties.after) == "function") 
+      self.properties.after();
 
     return true;
   }
