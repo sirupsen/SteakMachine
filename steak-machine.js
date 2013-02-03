@@ -25,24 +25,27 @@ SteakMachine = function(events, subject) {
 
   self.setState(self.events[0].properties["from"]);
 
-  self.nextRepeat = function(times) {
+  self.next = function(times) {
+    var times = times || 1;
+
+    var go = function() {
+      for(var i = 0; i < self.events.length; i++) {
+        var event = self.events[i];
+
+        if(event.isValid())
+          return event.execute();
+      }
+
+      throw new Error("No event available; either it is invalid or you are at the end of the chain.");
+    }
+
     for(var i = 0; i < times; i++) {
-      var res = self.next();
-      if(!res) return false;
+      var res = go();
+      if(!res) 
+        return false;
     }
 
     return true;
-  }
-
-  self.next = function() {
-    for(var i = 0; i < self.events.length; i++) {
-      var event = self.events[i];
-
-      if(event.isValid())
-        return event.execute();
-    }
-
-    throw new Error("No event available; either it is invalid or you are at the end of the chain.");
   }
 
   self.transition = function(name) {

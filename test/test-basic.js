@@ -41,14 +41,14 @@ exports.basic = {
   },
 
   testRepetitiveNext: function(test) {
-    this.tester.stateMachine.nextRepeat(3);
+    this.tester.stateMachine.next(3);
     test.equal(this.tester.stateMachine.state(), "D");
 
     test.done();
   },
 
   testNoEvent: function(test) {
-    this.tester.stateMachine.nextRepeat(3);
+    this.tester.stateMachine.next(3);
     test.throws(function() { this.tester.stateMachine.next() });
 
     test.done();
