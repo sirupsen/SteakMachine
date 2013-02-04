@@ -8,7 +8,7 @@
     "email": "sirup@sirupsen.com"
   }],
   "scripts": {
-    "test": "node_modules/.bin/nodeunit test"
+    "test": "make test"
   },
   "main": "./lib/steak-machine.js",
   "repository": {
