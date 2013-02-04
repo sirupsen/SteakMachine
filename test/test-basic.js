@@ -104,21 +104,16 @@ exports.functionState = {
 exports.ringStates = {
   setUp: function(callback) {
     this.walrus = {
-      state: "lol",
-
       stateMachine: new SteakMachine([
         {
-          name: "eat",
           from: "hungry",
           to: "satisfied"
         },
         {
-          name: "scate ice",
           from: "satisfied",
           to: "sleepy"
         },
         {
-          name: "sleep",
           from: "sleepy",
           to: "hungry"
         }
@@ -131,7 +126,7 @@ exports.ringStates = {
   testRing: function(test) {
     test.equal(this.walrus.stateMachine.state(), "hungry");
 
-    this.walrus.stateMachine.transition("eat");
+    this.walrus.stateMachine.next();
 
     test.equal(this.walrus.stateMachine.state(), "satisfied");
 
@@ -139,10 +134,50 @@ exports.ringStates = {
 
     test.equal(this.walrus.stateMachine.state(), "sleepy");
 
-    this.walrus.stateMachine.transition("sleep");
+    this.walrus.stateMachine.next();
 
     test.equal(this.walrus.stateMachine.state(), "hungry");
 
+    test.done();
+  }
+}
+
+exports.modifyOriginalState = {
+  setUp: function(callback) {
+    function Walrus() {
+      this.state = "lol";
+
+      this.stateMachine = new SteakMachine([
+        {
+          from: "hungry",
+          to: "satisfied"
+        },
+        {
+          from: "satisfied",
+          to: "sleepy"
+        },
+        {
+          from: "sleepy",
+          to: "hungry"
+        }
+      ], this);
+    }
+
+    this.walrus = new Walrus();
+
+    callback();
+  },
+
+  testDefaultSubjectStateShouldChange: function(test) {
+    test.equal(this.walrus.state, "hungry");
+
+    test.done();
+  },
+
+  testMoveOriginalStateAndStateMachineState: function(test) {
+    this.walrus.stateMachine.next();
+    test.equal(this.walrus.state, "satisfied");
+    test.equal(this.walrus.stateMachine.state(), "satisfied");
     test.done();
   }
 }
