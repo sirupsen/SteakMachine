@@ -100,3 +100,49 @@ exports.functionState = {
     test.done();
   },
 }
+
+exports.ringStates = {
+  setUp: function(callback) {
+    this.walrus = {
+      state: "lol",
+
+      stateMachine: new SteakMachine([
+        {
+          name: "eat",
+          from: "hungry",
+          to: "satisfied"
+        },
+        {
+          name: "scate ice",
+          from: "satisfied",
+          to: "sleepy"
+        },
+        {
+          name: "sleep",
+          from: "sleepy",
+          to: "hungry"
+        }
+      ], this)
+    }
+
+    callback();
+  },
+
+  testRing: function(test) {
+    test.equal(this.walrus.stateMachine.state(), "hungry");
+
+    this.walrus.stateMachine.transition("eat");
+
+    test.equal(this.walrus.stateMachine.state(), "satisfied");
+
+    this.walrus.stateMachine.next();
+
+    test.equal(this.walrus.stateMachine.state(), "sleepy");
+
+    this.walrus.stateMachine.transition("sleep");
+
+    test.equal(this.walrus.stateMachine.state(), "hungry");
+
+    test.done();
+  }
+}
