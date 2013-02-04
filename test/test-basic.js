@@ -139,13 +139,20 @@ exports.ringStates = {
     test.equal(this.walrus.stateMachine.state(), "hungry");
 
     test.done();
+  },
+
+  testRingNextRepeation: function(test) {
+    this.walrus.stateMachine.next(19);
+    test.equal(this.walrus.stateMachine.state(), "satisfied");
+
+    test.done();
   }
 }
 
-exports.modifyOriginalState = {
+exports["State modifications:"] = {
   setUp: function(callback) {
     function Walrus() {
-      this.state = "lol";
+      this.state = "default";
 
       this.stateMachine = new SteakMachine([
         {
@@ -168,13 +175,13 @@ exports.modifyOriginalState = {
     callback();
   },
 
-  testDefaultSubjectStateShouldChange: function(test) {
+  "state machine changes default state when initialized": function(test) {
     test.equal(this.walrus.state, "hungry");
 
     test.done();
   },
 
-  testMoveOriginalStateAndStateMachineState: function(test) {
+  "change original state and state machine state on transition": function(test) {
     this.walrus.stateMachine.next();
     test.equal(this.walrus.state, "satisfied");
     test.equal(this.walrus.stateMachine.state(), "satisfied");
